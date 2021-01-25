@@ -1,32 +1,30 @@
 import { IncomingMessage, ServerResponse } from "http";
 import {
   addController,
+  findClosestLocationController,
   removeController,
   updateController,
 } from "./controllers";
-import { sendErrorResponse } from "./utils";
+import { sendNotFoundResponse } from "./utils";
 
 const router = (request: IncomingMessage, response: ServerResponse) => {
-  switch (request.url) {
-    case "/add":
-      addController(request, response);
-      break;
-    case "/delete":
-      removeController(request, response);
-      break;
-    case "/update":
-      updateController(request, response);
-      break;
-    case "/findClosest":
-      // TODO implements.
-      break;
-    default:
-      if (process.env.NODE_ENV == "development" && request.url == "/test") {
-        testController(request, response);
-      } else sendErrorResponse(response);
-  }
+  if (request.url === "/add" && request.method === "POST") {
+    addController(request, response);
+  } else if (request.url === "/delete" && request.method === "DELETE") {
+    removeController(request, response);
+  } else if (request.url === "/update" && request.method === "PATCH") {
+    updateController(request, response);
+  } else if (request.url === "/findClosest" && request.method === "GET") {
+    findClosestLocationController(request, response);
+  } else if (process.env.NODE_ENV == "development" && request.url == "/test") {
+    testController(request, response);
+  } else sendNotFoundResponse(response);
 };
 export default router;
+
+///////////////////////////////////////////////////////////////////////////////
+///                             ONLY FOR TESTS                              ///
+///////////////////////////////////////////////////////////////////////////////
 
 const testController = (request: IncomingMessage, response: ServerResponse) => {
   const CoordinatesRepositoryClass = require("../data/inMemoryCoordinatesRepository")
@@ -52,4 +50,3 @@ function mapToObject(map: Map<string, any>) {
   });
   return out;
 }
-

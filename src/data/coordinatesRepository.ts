@@ -1,4 +1,4 @@
-import { Coordinates } from "./dataModels";
+import { Coordinates, CoordinatesWrapper } from "./dataModels";
 
 export interface CoordinatesRepository {
   getCoordinates(cityName: string, id: string): Coordinates;
@@ -7,6 +7,7 @@ export interface CoordinatesRepository {
   getTotalCoordinatesCount(): number;
   contains(id: string, cityName: string): boolean;
   removeCoordinates(cityName: string, id: string): void;
+  getCoordinatesByCityName(cityName: string): Map<string, CoordinatesWrapper>;
 }
 
 export class CoordinatesRepositoryException extends Error {

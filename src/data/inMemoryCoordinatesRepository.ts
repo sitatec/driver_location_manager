@@ -2,7 +2,7 @@ import {
   CoordinatesRepository,
   CoordinatesRepositoryException,
 } from "./coordinatesRepository";
-import { Coordinates, InMemoryDatabaseStructure } from "./dataModels";
+import { Coordinates, CoordinatesWrapper, InMemoryDatabaseStructure } from "./dataModels";
 
 // TODO: Refactoring (create a class InMemoryDatabase wich will extends a Database class)
 
@@ -12,6 +12,13 @@ const inMemoryDatabase: InMemoryDatabaseStructure = new Map();
 
 export default class InMemoryCoordinatesRepository
   implements CoordinatesRepository {
+    
+  getCoordinatesByCityName(cityName: string): Map<string, CoordinatesWrapper> {
+    const coordinates = inMemoryDatabase.get(cityName);
+    if(coordinates) return coordinates;
+    throw CoordinatesRepositoryException.coordinatesNotFound();
+  }
+
   saveCoordinates(
     cityName: string,
     id: string,

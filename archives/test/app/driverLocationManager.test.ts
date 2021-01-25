@@ -1,7 +1,10 @@
 import DriverLocationManager from "../../src/app/driverLocationManager";
 import { LocationManagerException } from "../../src/app/locationManagerException";
-import { Coordinates, Location } from "../../src/data/dataModels";
-import InMemoryCoordinatesRepository from "../../src/data/inMemoryCoordinatesRepository";
+import { CoordinatesRepositoryException } from "../../../src/data/coordinatesRepository";
+import { Coordinates, Location } from "../../../src/data/dataModels";
+import InMemoryCoordinatesRepository from "../../../src/data/inMemoryCoordinatesRepository";
+
+jest.mock("../../src/data/inMemoryCoordinatesRepository");
 
 const coordinatesRepository = new InMemoryCoordinatesRepository();
 const driverLocationManager = new DriverLocationManager(coordinatesRepository);
@@ -18,25 +21,29 @@ const fakeLocation: Location = {
 };
 
 describe("DriverLocationManager.", () => {
-  beforeEach(() => {
-    coordinatesRepository.clearOldCoordinates(0); // remove all coordinates.
-  });
-
   test("addLocatioin() should add new Location", () => {
     driverLocationManager.addLocation(fakeId, fakeLocation);
-    expect(coordinatesRepository.contains(fakeId, fakeCity)).toBeTruthy();
+    expect(coordinatesRepository.saveCoordinates).toBeCalledWith(
+      fakeCity,
+      fakeId,
+      fakeCoordinates
+    );
   });
 
   test("removeLocation() should remove the location", () => {
-    driverLocationManager.addLocation(fakeId, fakeLocation);
-    expect(coordinatesRepository.contains(fakeId, fakeCity)).toBeTruthy();
     driverLocationManager.removeLocation(fakeId, fakeCity);
-    expect(coordinatesRepository.contains(fakeId, fakeCity)).toBeFalsy();
+    expect(coordinatesRepository.removeCoordinates).toBeCalledWith(
+      fakeCity,
+      fakeId
+    );
   });
 
   test("removeLocation() throw a exception", () => {
+    coordinatesRepository.removeCoordinates = jest.fn(() => {
+      throw CoordinatesRepositoryException.coordinatesNotFound();
+    });
     expect(() =>
-      driverLocationManager.removeLocation("unsaved-Id", "unknown-city")
+      driverLocationManager.removeLocation(fakeId, fakeCity)
     ).toThrow(LocationManagerException.UnableToRemoveUnsavedLocation());
   });
 
@@ -50,18 +57,19 @@ describe("DriverLocationManager.", () => {
   });
 
   test("updateLocation() should update the location", () => {
-    const newCoordinates = new Coordinates(0, 0);
-    const newLocation = new Location(fakeCity, newCoordinates);
-    driverLocationManager.addLocation(fakeId, fakeLocation);
-    driverLocationManager.updateLocation(fakeId, newLocation);
-    expect(coordinatesRepository.getCoordinates(fakeCity, fakeId)).toBe(
-      newCoordinates
+    coordinatesRepository.contains = jest.fn(() => true);
+    driverLocationManager.updateLocation(fakeId, fakeLocation);
+    expect(coordinatesRepository.saveCoordinates).toBeCalledWith(
+      fakeCity,
+      fakeId,
+      fakeCoordinates
     );
   });
 
   test("updateLocation() should throw a exception", () => {
+    coordinatesRepository.contains = jest.fn(() => false);
     expect(() =>
-      driverLocationManager.updateLocation("unsaved-Id", fakeLocation)
+      driverLocationManager.updateLocation(fakeId, fakeLocation)
     ).toThrow(LocationManagerException.UnableToUpdateUnsavedLocation());
   });
 });

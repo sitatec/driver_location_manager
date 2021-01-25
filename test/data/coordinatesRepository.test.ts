@@ -127,4 +127,13 @@ describe("CoordinatesRepository.", () => {
     coordinatesRepository.saveCoordinates(fakeCity, fakeId, fakeCoordinates);
     expect(coordinatesRepository.contains(fakeId, fakeCity)).toBeTruthy();
   });
+
+  test("getCoordinatesByCityName() should get all coordinates of a given city", () => {
+    coordinatesRepository.saveCoordinates(fakeCity, fakeId, fakeCoordinates);
+    coordinatesRepository.saveCoordinates(fakeCity, otherId, otherCoordinates);
+    coordinatesRepository.saveCoordinates("otheCity", "-Id-", otherCoordinates);
+    const cityCoordinates = coordinatesRepository.getCoordinatesByCityName(fakeCity);
+    expect(cityCoordinates?.get(fakeId)?.coordinates).toBe(fakeCoordinates);
+    expect(cityCoordinates?.get(otherId)?.coordinates).toBe(otherCoordinates);
+  });
 });

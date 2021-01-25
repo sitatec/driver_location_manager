@@ -1,19 +1,13 @@
 import { IncomingMessage, ServerResponse } from "http";
-import { sendErrorResponse, getRequestData } from "./utils";
+import {
+  sendNotFoundResponse,
+  getRequestData,
+  getSortedClosestCoordinates,
+} from "./utils";
 import InMemoryCoordinatesRepository from "../data/inMemoryCoordinatesRepository";
 import { CoordinatesRepositoryExceptionType } from "../data/coordinatesRepository";
-// TODO write better error handler.
-// TODO refactore repetitive code in the controller && remove unnecessary  abstraction.
-const coordinatesRepository = new InMemoryCoordinatesRepository();
 
-// const wrappeConntrollerLogic = async (controllerLogic: (data: JsonType) => void, response: ServerResponse, request: IncomingMessage) => {
-//   try {
-//     const data = await getRequestData(request);
-//     controllerLogic(data);
-//   } catch (_) {
-//     response.writeHead(500).end();
-//   }
-// }
+const coordinatesRepository = new InMemoryCoordinatesRepository();
 
 const errorHandler = (error: any, response: ServerResponse) => {
   if (
@@ -29,14 +23,9 @@ const addController = async (
   request: IncomingMessage,
   response: ServerResponse
 ) => {
-  if (request.method !== "POST") sendErrorResponse(response);
   try {
     const data = await getRequestData(request);
-    coordinatesRepository.saveCoordinates(
-      data.location.cityName,
-      data.id,
-      data.location.coordinates
-    );
+    coordinatesRepository.saveCoordinates(data.city, data.id, data.coord);
     response.writeHead(200).end();
   } catch (error) {
     errorHandler(error, response);
@@ -47,16 +36,12 @@ const updateController = async (
   request: IncomingMessage,
   response: ServerResponse
 ) => {
-  if (request.method !== "PATCH") sendErrorResponse(response);
   try {
     const data = await getRequestData(request);
-    if (!coordinatesRepository.contains(data.id, data.location.cityName))
-      sendErrorResponse(response);
-    coordinatesRepository.saveCoordinates(
-      data.location.cityName,
-      data.id,
-      data.location.coordinates
-    );
+    if (!coordinatesRepository.contains(data.id, data.city)) {
+      sendNotFoundResponse(response);
+    }
+    coordinatesRepository.saveCoordinates(data.city, data.id, data.coord);
     response.writeHead(200).end();
   } catch (error) {
     errorHandler(error, response);
@@ -67,14 +52,31 @@ const removeController = async (
   request: IncomingMessage,
   response: ServerResponse
 ) => {
-  if (request.method !== "DELETE") sendErrorResponse(response);
   try {
     const data = await getRequestData(request);
-    coordinatesRepository.removeCoordinates(data.cityName, data.id);
+    coordinatesRepository.removeCoordinates(data.city, data.id);
     response.writeHead(200).end();
   } catch (error) {
     errorHandler(error, response);
   }
 };
 
-export { addController, removeController, updateController };
+const findClosestLocationController = async (
+  request: IncomingMessage,
+  response: ServerResponse
+) => {
+  const data = await getRequestData(request);
+  const coordinatesList = coordinatesRepository.getCoordinatesByCityName(
+    data.city
+  );
+  const result = getSortedClosestCoordinates(coordinatesList, data);
+  if (result.length != 0) response.writeHead(200).end(JSON.stringify(result));
+  else sendNotFoundResponse(response);
+};
+
+export {
+  addController,
+  removeController,
+  updateController,
+  findClosestLocationController,
+};

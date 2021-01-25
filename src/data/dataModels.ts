@@ -1,14 +1,10 @@
 export class Coordinates {
-  constructor(public latitude: number, public longitude: number) {}
+  constructor(public lat: number, public lon: number) {}
 }
 
-type CoordinatesWrapper = {
+export interface CoordinatesWrapper {
   lastWriteTime: number;
   coordinates: Coordinates;
-};
-
-export class Location {
-  constructor(public cityName: string, public coordinates: Coordinates){}
 }
 
 export type InMemoryDatabaseStructure = Map<
