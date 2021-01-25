@@ -1,9 +1,9 @@
 import {
   CoordinatesRepository,
   CoordinatesRepositoryExceptionType,
-} from "../data/coordinatesRepository";
-import { Location } from "../data/dataModels";
-import InMemoryCoordinatesRepository from "../data/inMemoryCoordinatesRepository";
+} from "../../src/data/coordinatesRepository";
+import { Location } from "../../src/data/dataModels";
+import InMemoryCoordinatesRepository from "../../src/data/inMemoryCoordinatesRepository";
 import { LocationManagerException } from "./locationManagerException";
 
 export default class DriverLocationManager {

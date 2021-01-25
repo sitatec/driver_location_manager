@@ -1,6 +1,6 @@
 import { IncomingMessage, ServerResponse } from "http";
 
-const banClient = (httpResponse: ServerResponse) =>
+const sendErrorResponse = (httpResponse: ServerResponse) =>
   httpResponse.writeHead(404).end();
 
 const getRequestData = (request: IncomingMessage, parseData = true): Promise<JsonType> => {
@@ -9,7 +9,6 @@ const getRequestData = (request: IncomingMessage, parseData = true): Promise<Jso
     request
       .on("data", (chunk) => (data += chunk))
       .on("end", () => {
-        console.log("\n\n Data: " + data + "\n\n")
         if(!data) return reject(Error('invalid-data'))
         try {
           resolve(JSON.parse(data));
@@ -26,4 +25,4 @@ export type JsonType = {
   [key: string]: any;
 };
 
-export { banClient, getRequestData };
+export { sendErrorResponse, getRequestData };

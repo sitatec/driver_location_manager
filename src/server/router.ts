@@ -4,10 +4,9 @@ import {
   removeController,
   updateController,
 } from "./controllers";
-import { banClient } from "./utils";
+import { sendErrorResponse } from "./utils";
 
 const router = (request: IncomingMessage, response: ServerResponse) => {
-  console.log(request.url);
   switch (request.url) {
     case "/add":
       addController(request, response);
@@ -24,7 +23,7 @@ const router = (request: IncomingMessage, response: ServerResponse) => {
     default:
       if (process.env.NODE_ENV == "development" && request.url == "/test") {
         testController(request, response);
-      } else banClient(response);
+      } else sendErrorResponse(response);
   }
 };
 export default router;
