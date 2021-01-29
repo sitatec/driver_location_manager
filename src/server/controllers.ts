@@ -65,13 +65,18 @@ const findClosestLocationController = async (
   request: IncomingMessage,
   response: ServerResponse
 ) => {
-  const data = await getRequestData(request);
-  const coordinatesList = coordinatesRepository.getCoordinatesByCityName(
-    data.city
-  );
-  const result = getSortedClosestCoordinates(coordinatesList, data);
-  if (result.length != 0) response.writeHead(200).end(JSON.stringify(result));
-  else sendNotFoundResponse(response);
+  try {
+    const data = await getRequestData(request);
+    const coordinatesList = coordinatesRepository.getCoordinatesByCityName(
+      data.city
+    );
+    const result = getSortedClosestCoordinates(coordinatesList, data);
+    if (Object.keys(result).length != 0) {
+      response.writeHead(200).end(JSON.stringify(result));
+    } else sendNotFoundResponse(response);
+  } catch (error) {
+    errorHandler(error, response);
+  }
 };
 
 export {

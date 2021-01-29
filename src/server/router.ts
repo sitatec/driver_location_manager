@@ -14,7 +14,7 @@ const router = (request: IncomingMessage, response: ServerResponse) => {
     removeController(request, response);
   } else if (request.url === "/update" && request.method === "PATCH") {
     updateController(request, response);
-  } else if (request.url === "/findClosest" && request.method === "GET") {
+  } else if (request.url === "/findClosest" && request.method === "POST") {
     findClosestLocationController(request, response);
   } else if (process.env.NODE_ENV == "development" && request.url == "/test") {
     testController(request, response);

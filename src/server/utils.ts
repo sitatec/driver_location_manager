@@ -43,10 +43,10 @@ const getSortedClosestCoordinates = (
 ) => {
   let coordinates: Coordinates;
   const closestCoordinates: any = {};
-  let distance: number;
+  let distance: string;
   coordinatesList.forEach((coordinatesWrapper, id) => {
     coordinates = coordinatesWrapper.coordinates;
-    distance = distanceBetween(data.coord, coordinates);
+    distance = distanceBetween(data.coord, coordinates).toFixed(5);
     if (distance <= data.maxDistance){
       closestCoordinates[distance] = { [id]: coordinates }; 
       if (--data.count === 0) return null;
