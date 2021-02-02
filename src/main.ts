@@ -2,7 +2,7 @@ import http from "http";
 import InMemoryCoordinatesRepository from "./data/inMemoryCoordinatesRepository";
 import router from "./server/router";
 // Remove all console logs.
-http.createServer(router).listen(3000, () => console.log("Started"));
+http.createServer(router).listen(process.env.PORT || 80);
 
 const oneHourInMilliseconds = 3_600_000;
 const coordinatesRepository = new InMemoryCoordinatesRepository();

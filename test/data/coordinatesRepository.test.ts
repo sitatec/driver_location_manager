@@ -132,8 +132,27 @@ describe("CoordinatesRepository.", () => {
     coordinatesRepository.saveCoordinates(fakeCity, fakeId, fakeCoordinates);
     coordinatesRepository.saveCoordinates(fakeCity, otherId, otherCoordinates);
     coordinatesRepository.saveCoordinates("otheCity", "-Id-", otherCoordinates);
-    const cityCoordinates = coordinatesRepository.getCoordinatesByCityName(fakeCity);
+    const cityCoordinates = coordinatesRepository.getCoordinatesByCityName(
+      fakeCity
+    );
     expect(cityCoordinates?.get(fakeId)?.coordinates).toBe(fakeCoordinates);
     expect(cityCoordinates?.get(otherId)?.coordinates).toBe(otherCoordinates);
+  });
+
+  test("removeCoordinates() should delete coordinates", () => {
+    coordinatesRepository.saveCoordinates(fakeCity, fakeId, fakeCoordinates);
+    coordinatesRepository.removeCoordinates(fakeCity, fakeId);
+    expect(coordinatesRepository.getTotalCoordinatesCount()).toEqual(0);
+  });
+
+  test("removeCoordinates() should throw a exception (not found)", () => {
+    coordinatesRepository.saveCoordinates(fakeCity, fakeId, fakeCoordinates);
+    expect(() =>
+      coordinatesRepository.removeCoordinates(fakeCity, "unregisteredID")
+    ).toThrow(CoordinatesRepositoryException.coordinatesNotFound());
+
+    expect(() =>
+      coordinatesRepository.removeCoordinates("unregisteredCity", fakeId)
+    ).toThrow(CoordinatesRepositoryException.coordinatesNotFound());
   });
 });

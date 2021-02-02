@@ -2,12 +2,15 @@
   "name": "driver_location_manager",
   "version": "1.0.0",
   "description": "Taluxi drivers location manager",
-  "main": "src/main.ts",
   "scripts": {
     "test": "jest",
-    "start": "ts-node src/main.ts",
-    "dev": "cross-env NODE_ENV=development nodemon --watch 'src/**/*.ts' --exec 'ts-node' src/main.ts"
+    "start": "node ./build/main.js",
+    "gcp-build": "tsc -p .",
+    "deploy": "gcloud app deploy",
+    "dev": "cross-env NODE_ENV=development nodemon --watch 'src/**/*.ts' --exec 'ts-node' src/main.ts",
+    "clean": "rd /s /q build"
   },
+  "dependencies": {},
   "author": "Sita Bérété",
   "license": "Proprietary",
   "devDependencies": {

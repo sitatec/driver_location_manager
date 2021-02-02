@@ -69,7 +69,7 @@ export default class InMemoryCoordinatesRepository
   // TODO test
   removeCoordinates(cityName: string, id: string): void {
     const cityCoordinatesList = inMemoryDatabase.get(cityName);
-    if (cityCoordinatesList) cityCoordinatesList.delete(id);
+    if (cityCoordinatesList?.has(id)) cityCoordinatesList.delete(id);
     else throw CoordinatesRepositoryException.coordinatesNotFound();
   }
 
